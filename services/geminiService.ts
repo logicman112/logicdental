@@ -2,10 +2,8 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { AnalysisResponse } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
 export const analyzeDentalImages = async (upperBase64: string, lowerBase64: string): Promise<AnalysisResponse> => {
-  // 사용자의 요청에 따라 Flash(무료급) 모델인 gemini-3-flash-preview 사용
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   const model = 'gemini-3-flash-preview';
   
   const systemInstruction = `
@@ -28,41 +26,49 @@ export const analyzeDentalImages = async (upperBase64: string, lowerBase64: stri
     반드시 JSON 형식으로만 응답하십시오.
   `;
 
-  const response = await ai.models.generateContent({
-    model,
-    contents: {
-      parts: [
-        { text: "로직이야! 여기 내 치아 사진 두 장 보낼게. 어디가 아픈지, 뭘 해야 하는지 쉽게 좀 알려줘!" },
-        { inlineData: { mimeType: 'image/jpeg', data: upperBase64.split(',')[1] } },
-        { inlineData: { mimeType: 'image/jpeg', data: lowerBase64.split(',')[1] } },
-      ]
-    },
-    config: {
-      systemInstruction,
-      responseMimeType: "application/json",
-      responseSchema: {
-        type: Type.OBJECT,
-        properties: {
-          summary: { type: Type.STRING },
-          scalingRequired: { type: Type.BOOLEAN },
-          scalingUrgency: { type: Type.STRING, enum: ['low', 'medium', 'high'] },
-          sections: {
-            type: Type.ARRAY,
-            items: {
-              type: Type.OBJECT,
-              properties: {
-                title: { type: Type.STRING },
-                content: { type: Type.STRING },
-                type: { type: Type.STRING, enum: ['observation', 'recommendation', 'warning'] }
-              },
-              required: ["title", "content", "type"]
+  try {
+    const response = await ai.models.generateContent({
+      model,
+      contents: [
+        {
+          role: 'user',
+          parts: [
+            { text: "로직이야! 여기 내 치아 사진 두 장 보낼게. 어디가 아픈지, 뭘 해야 하는지 쉽게 좀 알려줘!" },
+            { inlineData: { mimeType: 'image/jpeg', data: upperBase64.split(',')[1] } },
+            { inlineData: { mimeType: 'image/jpeg', data: lowerBase64.split(',')[1] } },
+          ]
+        }
+      ],
+      config: {
+        systemInstruction,
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            summary: { type: Type.STRING },
+            scalingRequired: { type: Type.BOOLEAN },
+            scalingUrgency: { type: Type.STRING, enum: ['low', 'medium', 'high'] },
+            sections: {
+              type: Type.ARRAY,
+              items: {
+                type: Type.OBJECT,
+                properties: {
+                  title: { type: Type.STRING },
+                  content: { type: Type.STRING },
+                  type: { type: Type.STRING, enum: ['observation', 'recommendation', 'warning'] }
+                },
+                required: ["title", "content", "type"]
+              }
             }
-          }
-        },
-        required: ["summary", "scalingRequired", "scalingUrgency", "sections"]
+          },
+          required: ["summary", "scalingRequired", "scalingUrgency", "sections"]
+        }
       }
-    }
-  });
+    });
 
-  return JSON.parse(response.text || '{}') as AnalysisResponse;
+    return JSON.parse(response.text || '{}') as AnalysisResponse;
+  } catch (error) {
+    console.error("Gemini Analysis Error:", error);
+    throw error;
+  }
 };

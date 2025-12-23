@@ -28,7 +28,7 @@ const LogicChatbot: React.FC = () => {
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
       const response = await ai.models.generateContent({
         model: 'gemini-3-flash-preview',
-        contents: userMsg,
+        contents: [{ role: 'user', parts: [{ text: userMsg }] }],
         config: {
           systemInstruction: `당신은 '로직이'라는 이름의 치과 전문가 챗봇입니다.
           
@@ -43,6 +43,7 @@ const LogicChatbot: React.FC = () => {
 
       setMessages(prev => [...prev, { role: 'bot', text: response.text || '미안, 잠시 딴생각을 했나 봐!\n다시 한번 말해줄래? 😅' }]);
     } catch (err) {
+      console.error("Chat Error:", err);
       setMessages(prev => [...prev, { role: 'bot', text: '오류가 났어!\n양치하고 다시 시도해보자! 🪥' }]);
     } finally {
       setIsTyping(false);

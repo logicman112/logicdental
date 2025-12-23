@@ -11,7 +11,9 @@ class AudioService {
     }
   }
 
-  // 배경음악(BGM) 관련 모든 함수 제거
+  // 예전 코드에서 호출될 수 있는 BGM 함수들을 빈 함수로 정의하여 에러 방지
+  startBGM() { /* BGM 기능 제거됨 */ }
+  stopBGM() { /* BGM 기능 제거됨 */ }
 
   playTap() {
     this.init();

@@ -4,11 +4,12 @@ import { audioService } from '../services/audioService';
 
 interface CameraCaptureProps {
   label: string;
+  tip: string;
   onCapture: (base64: string) => void;
   onBack: () => void;
 }
 
-const CameraCapture: React.FC<CameraCaptureProps> = ({ label, onCapture, onBack }) => {
+const CameraCapture: React.FC<CameraCaptureProps> = ({ label, tip, onCapture, onBack }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -77,7 +78,7 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({ label, onCapture, onBack 
         <button onClick={() => { audioService.playTap(); onBack(); }} className="p-3 bg-white/10 rounded-[1.2rem] border border-white/5 text-white">
           <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" /></svg>
         </button>
-        <h2 className="text-2xl font-black text-white tracking-tight uppercase">{label} 촬영</h2>
+        <h2 className="text-2xl font-black text-white tracking-tight uppercase">{label}</h2>
         <div className="w-12"></div>
       </div>
 
@@ -101,14 +102,16 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({ label, onCapture, onBack 
               playsInline
               className="w-full h-full object-cover"
             />
-            {/* High Contrast Medical Overlay */}
+            {/* Medical Guide Overlay */}
             <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center">
-              <div className="w-64 h-80 border-[3px] border-blue-500/60 rounded-[5rem] relative shadow-[0_0_40px_rgba(59,130,246,0.3)]">
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-blue-500 text-white text-[10px] font-black px-4 py-1 rounded-full uppercase tracking-widest shadow-lg">Target Area</div>
-                <div className="absolute inset-0 bg-blue-500/5 backdrop-blur-[1px] rounded-[5rem]"></div>
+              <div className="w-72 h-40 border-[3px] border-dashed border-blue-500/60 rounded-[5rem] relative shadow-[0_0_40px_rgba(59,130,246,0.3)]">
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-blue-500 text-white text-[10px] font-black px-4 py-1 rounded-full uppercase tracking-widest shadow-lg">치아 정렬</div>
               </div>
-              <div className="mt-10 bg-white/10 backdrop-blur-xl text-white px-6 py-3 rounded-[1.5rem] text-[11px] font-black tracking-[0.2em] border border-white/10 uppercase">
-                Focus on the teeth surface
+              
+              {/* Floating Tip Text */}
+              <div className="mt-8 mx-10 bg-black/60 backdrop-blur-md text-white px-6 py-4 rounded-[1.5rem] border border-white/20 text-center shadow-2xl animate-bounce">
+                <p className="text-sm font-black leading-tight text-blue-300">💡 촬영 꿀팁</p>
+                <p className="text-base font-black mt-1">{tip}</p>
               </div>
             </div>
           </>

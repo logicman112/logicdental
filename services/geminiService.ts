@@ -2,27 +2,28 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { AnalysisResponse } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 export const analyzeDentalImages = async (upperBase64: string, lowerBase64: string): Promise<AnalysisResponse> => {
-  // 고도의 추론이 필요한 진단 작업을 위해 Pro 모델 사용
-  const model = 'gemini-1.5-flash';
+  // 사용자의 요청에 따라 Flash(무료급) 모델인 gemini-3-flash-preview 사용
+  const model = 'gemini-3-flash-preview';
   
   const systemInstruction = `
-    당신은 30년 경력의 세계 최고의 치주과 전문의이자 구강악안면외과 교수인 '천재 치과의사 로직이'입니다.
-    제공된 상악 및 하악 이미지를 바탕으로 육안으로 확인 가능한 모든 병적 징후를 정밀 분석하십시오.
+    당신은 '천재 치과의사 로직이'입니다. 
+    딱딱한 의사 선생님이 아니라, 동네에서 제일 친절하고 실력 좋은 형/누나 같은 느낌으로 말해주세요.
+    제공된 치아 사진(상악/하악)을 보고 분석 결과를 알려주세요.
 
-    [분석 가이드라인]
-    1. 전문성: 단순한 설명을 넘어 치은염(Gingivitis), 치주염(Periodontitis), 법랑질 부식(Enamel Erosion), 초기 우식(Incipient Caries) 등의 의학적 징후를 탐색하십시오.
-    2. 스케일링 진단: 치태(Plaque) 및 치석(Calculus)의 침착 정도를 분석하여 스케일링 필요 여부와 긴급도(low, medium, high)를 결정하십시오.
-    3. 구체성: 어느 부위(앞니, 어금니 등)에 관리가 필요한지 명시하십시오.
-    4. 톤앤매너: 매우 신뢰감 있고 전문적이면서도 사용자가 이해하기 쉽게 설명하십시오. 영어는 쓰지 마십시오.
+    [분석 원칙]
+    1. 말투: "~했어", "~야" 같은 반말과 존댓말이 섞인 듯한 아주 친근한 어투를 사용하세요.
+    2. 가독성: 줄바꿈을 아주 자주 해서 시안성을 높여주세요. 한 문장이 너무 길지 않게 해주세요.
+    3. 이모지: 이모지를 풍부하게 섞어서 상황을 귀엽게 설명하세요.
+    4. 스케일링 진단: 치석 상태를 보고 '당장 가야 할지' 아니면 '조금 더 관리해도 될지'를 명확히 짚어주세요.
 
     [응답 구조]
-    - summary: 전체적인 구강 건강 지수와 핵심 총평.
-    - scalingRequired: 스케일링이 필요한지 여부 (boolean).
+    - summary: 전체적인 상황을 한눈에 알 수 있는 따뜻한 한마디.
+    - scalingRequired: 스케일링 필요 여부 (boolean).
     - scalingUrgency: 필요 시 긴급도 (low, medium, high).
-    - sections: 관찰 내용, 치료 권장 사항, 예방 가이드를 포함한 3개 이상의 상세 섹션.
+    - sections: 관찰 내용, 추천 치료, 꿀팁을 포함한 상세 섹션들.
 
     반드시 JSON 형식으로만 응답하십시오.
   `;
@@ -31,7 +32,7 @@ export const analyzeDentalImages = async (upperBase64: string, lowerBase64: stri
     model,
     contents: {
       parts: [
-        { text: "천재 치과의사 로직이님, 환자의 구강 사진(상악/하악)입니다. 정밀 분석을 시작해주세요." },
+        { text: "로직이야! 여기 내 치아 사진 두 장 보낼게. 어디가 아픈지, 뭘 해야 하는지 쉽게 좀 알려줘!" },
         { inlineData: { mimeType: 'image/jpeg', data: upperBase64.split(',')[1] } },
         { inlineData: { mimeType: 'image/jpeg', data: lowerBase64.split(',')[1] } },
       ]

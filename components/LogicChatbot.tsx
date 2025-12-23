@@ -4,7 +4,7 @@ import { GoogleGenAI } from "@google/genai";
 
 const LogicChatbot: React.FC = () => {
   const [messages, setMessages] = useState<{role: 'user' | 'bot', text: string}[]>([
-    { role: 'bot', text: '안녕! 나는 너의 든든한 이빨 지킴이 로직이야!\n\n평소 치아 고민이나 양치 습관에 대해 궁금한 게 있다면 뭐든지 물어봐줘! 내가 친절하게 설명해줄게! 🦷✨' }
+    { role: 'bot', text: '안녕! 나는 너의 든든한 이빨 지킴이 로직이야!\n\n평소 치아 고민이나 궁금한 게 있다면\n편하게 말해줘!\n\n내가 친절하고 쉽게 설명해줄게! 🦷✨' }
   ]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -30,20 +30,20 @@ const LogicChatbot: React.FC = () => {
         model: 'gemini-3-flash-preview',
         contents: userMsg,
         config: {
-          systemInstruction: `당신은 '로직이'라는 이름의 천재적이고 친절한 치과 전문가 챗봇입니다.
+          systemInstruction: `당신은 '로직이'라는 이름의 치과 전문가 챗봇입니다.
           
-          [대화 원칙]
-          1. 'ai' 혹은 '인공지능'이라는 단어를 언급하지 마세요. 또한 '의학적 고지'나 '참조용'이라는 경고 문구를 대화 중에 절대 포함하지 마세요 (홈 화면에 이미 기재되어 있습니다).
-          2. 매우 친근하고 다정한 말투(~했어, ~야)를 사용하세요.
-          3. 너무 전문적인 용어보다는 초등학생도 이해할 수 있을 만큼 쉽게 설명하세요.
-          4. 시안성을 위해 가독성 좋게 적절히 줄바꿈을 자주 해주세요 (특히 긴 설명일 경우).
-          5. 이모지를 적절히 섞어서 생동감 있게 대화하세요.`,
+          [필수 준수 사항]
+          1. 절대 답변 중에 'AI', '참조용', '의학적 고지' 등의 딱딱한 문구를 넣지 마세요.
+          2. 가독성을 위해 1~2문장마다 반드시 줄바꿈을 하세요.
+          3. 전문 용어보다는 "이빨 사이 찌꺼기", "잇몸이 부었을 때" 처럼 아주 쉬운 표현을 쓰세요.
+          4. 말투는 친구처럼 아주 친근하게 (~했어, ~야) 하세요.
+          5. 이모지를 한 문장에 하나씩은 섞어서 생동감 있게 하세요.`,
         }
       });
 
-      setMessages(prev => [...prev, { role: 'bot', text: response.text || '미안, 잠시 딴생각을 했나 봐! 다시 한번 말해줄래? 😅' }]);
+      setMessages(prev => [...prev, { role: 'bot', text: response.text || '미안, 잠시 딴생각을 했나 봐!\n다시 한번 말해줄래? 😅' }]);
     } catch (err) {
-      setMessages(prev => [...prev, { role: 'bot', text: '오류가 났어! 양치하고 다시 시도해보는 건 어때? 🪥' }]);
+      setMessages(prev => [...prev, { role: 'bot', text: '오류가 났어!\n양치하고 다시 시도해보자! 🪥' }]);
     } finally {
       setIsTyping(false);
     }
@@ -60,7 +60,7 @@ const LogicChatbot: React.FC = () => {
             <div className={`max-w-[90%] p-7 rounded-[3rem] text-lg font-black leading-relaxed shadow-2xl ${
               msg.role === 'user' 
                 ? 'bg-blue-600 text-white rounded-tr-none border-2 border-white/20' 
-                : 'bg-white/15 text-white rounded-tl-none border-2 border-white/10 backdrop-blur-xl'
+                : 'bg-white/15 text-white rounded-tl-none border-2 border-white/20 backdrop-blur-xl'
             }`}>
               <div className="whitespace-pre-wrap">{msg.text}</div>
             </div>
@@ -80,7 +80,7 @@ const LogicChatbot: React.FC = () => {
       </div>
 
       <div className="fixed bottom-[110px] left-0 right-0 p-6 bg-gradient-to-t from-black via-black/95 to-transparent">
-        <div className="max-w-2xl mx-auto flex items-center space-x-3 bg-white/20 backdrop-blur-3xl rounded-[3rem] p-3 border-2 border-white/20 shadow-2xl">
+        <div className="max-w-2xl mx-auto flex items-center space-x-3 bg-white/20 backdrop-blur-3xl rounded-[3rem] p-3 border-2 border-white/30 shadow-2xl">
           <input
             type="text"
             value={input}
@@ -89,7 +89,7 @@ const LogicChatbot: React.FC = () => {
             placeholder="로직이에게 물어보기..."
             className="flex-1 bg-transparent border-none rounded-2xl px-6 py-4 text-white placeholder-white/40 font-black text-lg focus:ring-0 outline-none"
           />
-          <button onClick={handleSend} className="bg-blue-600 text-white w-16 h-16 rounded-full shadow-2xl active:scale-90 transition-transform flex items-center justify-center border-2 border-white/20">
+          <button onClick={handleSend} className="bg-blue-600 text-white w-16 h-16 rounded-full shadow-2xl active:scale-90 transition-transform flex items-center justify-center border-2 border-white/30">
             <svg className="w-8 h-8 rotate-90" fill="currentColor" viewBox="0 0 20 20"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" /></svg>
           </button>
         </div>

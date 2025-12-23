@@ -11,6 +11,8 @@ class AudioService {
     }
   }
 
+  // 배경음악(BGM) 관련 모든 함수 제거
+
   playTap() {
     this.init();
     const osc = this.ctx!.createOscillator();

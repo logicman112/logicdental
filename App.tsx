@@ -18,13 +18,12 @@ const App: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [tipCategory, setTipCategory] = useState<'food' | 'care' | 'glossary'>('food');
   
-  // 양치 기록 로컬 스토리지
+  // 로그인 없이 핸드폰 브라우저에 저장되는 로컬 데이터
   const [brushingHistory, setBrushingHistory] = useState<BrushingHistory>(() => {
     const saved = localStorage.getItem('logic_brushing_history');
     return saved ? JSON.parse(saved) : {};
   });
 
-  // 진단 기록 로컬 스토리지
   const [diagnosisHistory, setDiagnosisHistory] = useState<DiagnosisRecord[]>(() => {
     const saved = localStorage.getItem('logic_diagnosis_history');
     return saved ? JSON.parse(saved) : [];
@@ -39,7 +38,6 @@ const App: React.FC = () => {
   }, [diagnosisHistory]);
 
   const handleToggleBrushing = (date: string, type: keyof BrushingRecord) => {
-    audioService.startBGM();
     setBrushingHistory(prev => {
       const current = prev[date] || { morning: false, lunch: false, dinner: false, gargle: false, floss: false };
       const next = { ...current, [type]: !current[type] };
@@ -51,7 +49,6 @@ const App: React.FC = () => {
   };
 
   const handleStartDiagnosis = () => {
-    audioService.startBGM();
     audioService.playSok();
     setStep('TRANSITION');
     setTimeout(() => {
@@ -60,7 +57,6 @@ const App: React.FC = () => {
   };
 
   const onTabChange = (id: ActiveTab) => {
-    audioService.startBGM();
     audioService.playTap();
     setActiveTab(id);
     setSelectedPastRecord(null);
@@ -73,7 +69,6 @@ const App: React.FC = () => {
       const result = await analyzeDentalImages(finalImages.upper, finalImages.lower);
       audioService.playSuccess();
       
-      // 새 진단 기록 추가
       const newRecord: DiagnosisRecord = {
         id: Date.now().toString(),
         date: new Date().toLocaleString('ko-KR'),
@@ -226,7 +221,7 @@ const App: React.FC = () => {
             {[
               { title: '🦷 치아가 썩었을 때', tips: ['즉시 치과 방문: 통증이 없어도 내부 전이는 매우 빠릅니다.', '과도한 양치 자제: 손상된 부위를 강하게 닦으면 오히려 악화될 수 있어요.', '당분 섭취 즉시 중단: 충치균의 주 먹이인 설탕을 완벽히 차단하세요.'] },
               { title: '🔩 임플란트 시 주의사항', tips: ['치간칫솔 사용 필수: 임플란트 주변에 음식물이 끼지 않게 철저히 관리하세요.', '주기적 정기 검진: 신경이 없어 염증이 생겨도 통증을 못 느낄 수 있습니다.', '금연 및 금주: 잇몸뼈와의 결합을 방해하고 주위염의 주원인이 됩니다.'] },
-              { title: '👄 틀니 시 관리법', tips: ['틀니 전용 세정제: 치약은 연마제가 있어 틀니를 마모시키니 절대 사용 금지!', '수면 시 반드시 제거: 잇몸도 휴식이 필요합니다. 찬물이 담긴 통에 보관하세요.', '부드러운 잇몸 마사지: 부드러운 칫솔로 잇몸을 자극해 혈액순환을 도와주세요.'] }
+              { title: '폼나게 치실 쓰는 법', tips: ['치실을 30~40cm 정도로 끊어서 양손 중지에 감으세요.', '치아 사이에 톱질하듯 부드럽게 밀어 넣으세요.', '치아를 C자 모양으로 감싸서 잇몸 안쪽까지 쓸어올려주세요.'] }
             ].map((section, idx) => (
               <div key={idx} className="bg-white/10 p-8 rounded-[3rem] border border-white/20">
                 <h4 className="font-[1000] text-white text-2xl mb-6">{section.title}</h4>
@@ -250,12 +245,7 @@ const App: React.FC = () => {
               { name: '레진', desc: '충치 부위를 제거한 뒤 치아 색상과 비슷한 고분자 재료로 채우는 간단한 치료입니다.' },
               { name: '인레이', desc: '충치가 클 때 본을 떠서 금이나 세라믹으로 제작한 조각을 끼워 넣는 정밀 치료 방식입니다.' },
               { name: '크라운', desc: '손상이 심한 치아 전체를 금속이나 도자기 재료로 씌워서 치아를 보호하는 보철 치료입니다.' },
-              { name: '임플란트', desc: '상실된 치아 부위의 뼈에 인공 뿌리를 심고 그 위에 보철물을 연결하는 인공 치아 시술입니다.' },
-              { name: '치주질환', desc: '잇몸과 치아 주변 조직에 생기는 병으로, 방치하면 치아가 흔들려 빠질 수 있는 무서운 병입니다.' },
-              { name: '신경치료', desc: '감염된 치아 내부의 신경을 제거하고 소독 후 대체 물질을 채우는 고도의 보존 치료입니다.' },
-              { name: '부정교합', desc: '위아래 치아가 제대로 맞물리지 않는 상태로, 저작 문제나 심미적 개선을 위해 교정이 필요합니다.' },
-              { name: '라미네이트', desc: '앞니 겉면을 얇게 깎아낸 뒤 도자기 판을 붙여 모양과 색상을 아름답게 바꾸는 치료입니다.' },
-              { name: '충치(우식)', desc: '세균이 당분을 분해하며 만든 산에 의해 치아의 단단한 조직이 녹아서 파괴되는 질환입니다.' }
+              { name: '임플란트', desc: '상실된 치아 부위의 뼈에 인공 뿌리를 심고 그 위에 보철물을 연결하는 인공 치아 시술입니다.' }
             ].map((item, idx) => (
               <div key={idx} className="bg-white/10 p-8 rounded-[2.5rem] border border-white/20">
                 <div className="flex items-center space-x-3 mb-3">
@@ -274,7 +264,7 @@ const App: React.FC = () => {
     switch (activeTab) {
       case 'home':
         return (
-          <div className="flex flex-col items-center px-6 pt-16 pb-32">
+          <div className="flex flex-col items-center px-6 pt-16 pb-40">
             <div className="mb-12 relative">
               <div className="absolute inset-0 bg-blue-500/20 blur-[100px] rounded-full scale-150 animate-pulse"></div>
               <div className="animate-sway text-[11rem] leading-none drop-shadow-[0_0_50px_rgba(59,130,246,0.6)] relative select-none">🦷</div>
@@ -303,14 +293,14 @@ const App: React.FC = () => {
         );
       case 'history':
         return (
-          <div className="p-6 space-y-8 animate-in slide-in-from-right-4 duration-500">
+          <div className="p-6 space-y-8 animate-in slide-in-from-right-4 duration-500 pb-40">
             <h2 className="text-4xl font-black text-white px-2 tracking-tight">관리기록 <span className="text-blue-500">📝</span></h2>
             {renderHistory()}
           </div>
         );
       case 'tips':
         return (
-          <div className="p-6 space-y-8 animate-in slide-in-from-right-4 duration-500 pb-48">
+          <div className="p-6 space-y-8 animate-in slide-in-from-right-4 duration-500 pb-40">
             <h2 className="text-4xl font-black text-white px-2 tracking-tight">치아 상식 <span className="text-cyan-400">💡</span></h2>
             <div className="flex space-x-2 bg-white/15 p-2 rounded-full border-2 border-white/20">
               {[{ id: 'food', label: '음식', emoji: '🍎' }, { id: 'care', label: '관리', emoji: '🏥' }, { id: 'glossary', label: '용어정리', emoji: '📚' }].map((cat) => (
@@ -329,7 +319,7 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black flex flex-col font-sans selection:bg-blue-500/30">
+    <div className="h-screen h-[100dvh] bg-black flex flex-col font-sans selection:bg-blue-500/30 overflow-hidden">
       <style>{`
         @keyframes sway { 0%, 100% { transform: translateX(-10px) translateY(0) rotate(-5deg); } 50% { transform: translateX(10px) translateY(-10px) rotate(5deg); } }
         @keyframes zoomInMouth { 0% { transform: scale(0.1); opacity: 0; } 30% { transform: scale(1.5); opacity: 1; } 80% { transform: scale(20); opacity: 1; } 100% { transform: scale(30); opacity: 0; } }
@@ -342,7 +332,7 @@ const App: React.FC = () => {
         .bg-mesh { background-image: radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.2) 0, transparent 50%), radial-gradient(at 100% 100%, rgba(99, 102, 241, 0.2) 0, transparent 50%); }
       `}</style>
 
-      <header className="bg-black/90 backdrop-blur-2xl sticky top-0 z-50 border-b border-white/20 px-6 py-5 flex items-center justify-between">
+      <header className="flex-none bg-black/90 backdrop-blur-2xl sticky top-0 z-50 border-b border-white/20 px-6 py-5 flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/20">
             <span className="text-white text-2xl">🦷</span>
@@ -352,12 +342,12 @@ const App: React.FC = () => {
         {step === 'RESULT' && <button onClick={reset} className="text-sm font-black text-white bg-blue-500 border border-white/20 px-5 py-2.5 rounded-full uppercase tracking-widest shadow-lg active:scale-90 transition-transform">다시 진단</button>}
       </header>
 
-      <main className="flex-1 overflow-y-auto relative bg-mesh">
+      <main className="flex-1 overflow-y-auto relative bg-mesh scroll-smooth">
         {step === 'INITIAL' && renderContent()}
         {step === 'TRANSITION' && <div className="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center overflow-hidden"><div className="animate-zoom-mouth text-[180px] pointer-events-none drop-shadow-[0_0_80px_rgba(255,255,255,0.3)]">👄</div><div className="animate-pop-text absolute text-8xl font-[1000] text-blue-500 drop-shadow-[0_0_40px_rgba(59,130,246,0.8)]">Ready!</div></div>}
-        {step === 'UPPER' && <CameraCapture label="상악(윗니)" onCapture={(img) => { audioService.playCheck(); setImages(prev => ({ ...prev, upper: img })); setStep('LOWER'); }} onBack={() => setStep('INITIAL')} />}
-        {step === 'LOWER' && <CameraCapture label="하악(아랫니)" onCapture={(img) => { audioService.playCheck(); const newImages = { ...images, lower: img }; setImages(newImages); setStep('PREVIEW'); }} onBack={() => setStep('UPPER')} />}
-        {step === 'PREVIEW' && <div className="max-w-md mx-auto p-8 space-y-10 animate-in fade-in duration-500 pb-48"><h2 className="text-4xl font-black text-white tracking-tight">촬영 확인 <span className="text-blue-400">📸</span></h2><div className="grid grid-cols-1 gap-8">{[{ label: 'Upper Jaw (상악)', img: images.upper, step: 'UPPER' }, { label: 'Lower Jaw (하악)', img: images.lower, step: 'LOWER' }].map((item, i) => (<div key={i} className="space-y-4"><div className="flex items-center justify-between px-2"><label className="text-xs font-black text-white uppercase tracking-widest">{item.label}</label><button onClick={() => { audioService.playTap(); setStep(item.step as CaptureStep); }} className="text-blue-400 text-sm font-black border-b border-blue-400/50">RETAKE</button></div><div className="relative rounded-[3rem] overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,1)] border-2 border-white/20 aspect-[4/3]"><img src={item.img || ''} className="w-full h-full object-cover" /><div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent pointer-events-none"></div></div></div>))}</div>{error && <p className="text-white text-sm font-black text-center bg-red-600/50 py-4 rounded-3xl border border-white/20">{error}</p>}<button onClick={() => { audioService.playTap(); startAnalysis(images); }} className="w-full py-7 bg-white text-black rounded-[2.5rem] font-black text-2xl shadow-[0_0_50px_rgba(255,255,255,0.2)] active:scale-95 transition-all">로직이 분석 시작! ✨</button></div>}
+        {step === 'UPPER' && <CameraCapture label="1. 윗니 (상악)" tip="모든 윗니가 보이게 찍어주세요" onCapture={(img) => { audioService.playCheck(); setImages(prev => ({ ...prev, upper: img })); setStep('LOWER'); }} onBack={() => setStep('INITIAL')} />}
+        {step === 'LOWER' && <CameraCapture label="2. 아랫니 (하악)" tip="모든 아랫니가 보이게 찍어주세요" onCapture={(img) => { audioService.playCheck(); const newImages = { ...images, lower: img }; setImages(newImages); setStep('PREVIEW'); }} onBack={() => setStep('UPPER')} />}
+        {step === 'PREVIEW' && <div className="max-w-md mx-auto p-8 space-y-10 animate-in fade-in duration-500 pb-48"><h2 className="text-4xl font-black text-white tracking-tight">촬영 확인 <span className="text-blue-400">📸</span></h2><div className="grid grid-cols-1 gap-8">{[{ label: '윗니 (상악)', img: images.upper, step: 'UPPER' }, { label: '아랫니 (하악)', img: images.lower, step: 'LOWER' }].map((item, i) => (<div key={i} className="space-y-4"><div className="flex items-center justify-between px-2"><label className="text-xs font-black text-white uppercase tracking-widest">{item.label}</label><button onClick={() => { audioService.playTap(); setStep(item.step as CaptureStep); }} className="text-blue-400 text-sm font-black border-b border-blue-400/50">RETAKE</button></div><div className="relative rounded-[3rem] overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,1)] border-2 border-white/20 aspect-[4/3]"><img src={item.img || ''} className="w-full h-full object-cover" /><div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent pointer-events-none"></div></div></div>))}</div>{error && <p className="text-white text-sm font-black text-center bg-red-600/50 py-4 rounded-3xl border border-white/20">{error}</p>}<button onClick={() => { audioService.playTap(); startAnalysis(images); }} className="w-full py-7 bg-white text-black rounded-[2.5rem] font-black text-2xl shadow-[0_0_50px_rgba(255,255,255,0.2)] active:scale-95 transition-all">로직이 분석 시작! ✨</button></div>}
         {step === 'ANALYZING' && <div className="flex flex-col items-center justify-center h-full min-h-[75vh] space-y-10 px-10 text-center"><div className="relative"><div className="w-40 h-40 border-[12px] border-white/10 border-t-blue-600 rounded-full animate-spin"></div><div className="absolute inset-0 flex items-center justify-center"><span className="text-7xl animate-pulse">🦷</span></div></div><div className="space-y-4"><h3 className="text-4xl font-[1000] text-white tracking-tight">정밀 스캔 중...</h3><p className="text-white font-[1000] text-lg opacity-100">데이터 엔진이 치아와 잇몸을 분석하고 있습니다</p></div></div>}
         {step === 'RESULT' && analysis && <div className="animate-in fade-in slide-in-from-bottom-10 duration-1000"><AnalysisResultView result={analysis} images={images} onReset={reset} /></div>}
       </main>

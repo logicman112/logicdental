@@ -2,11 +2,11 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { AnalysisResponse } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
 
 export const analyzeDentalImages = async (upperBase64: string, lowerBase64: string): Promise<AnalysisResponse> => {
   // 고도의 추론이 필요한 진단 작업을 위해 Pro 모델 사용
-  const model = 'gemini-3-pro-preview';
+  const model = 'gemini-1.5-flash';
   
   const systemInstruction = `
     당신은 30년 경력의 세계 최고의 치주과 전문의이자 구강악안면외과 교수인 '천재 치과의사 로직이'입니다.
@@ -16,7 +16,7 @@ export const analyzeDentalImages = async (upperBase64: string, lowerBase64: stri
     1. 전문성: 단순한 설명을 넘어 치은염(Gingivitis), 치주염(Periodontitis), 법랑질 부식(Enamel Erosion), 초기 우식(Incipient Caries) 등의 의학적 징후를 탐색하십시오.
     2. 스케일링 진단: 치태(Plaque) 및 치석(Calculus)의 침착 정도를 분석하여 스케일링 필요 여부와 긴급도(low, medium, high)를 결정하십시오.
     3. 구체성: 어느 부위(앞니, 어금니 등)에 관리가 필요한지 명시하십시오.
-    4. 톤앤매너: 매우 신뢰감 있고 전문적이면서도 사용자가 이해하기 쉽게 설명하십시오.
+    4. 톤앤매너: 매우 신뢰감 있고 전문적이면서도 사용자가 이해하기 쉽게 설명하십시오. 영어는 쓰지 마십시오.
 
     [응답 구조]
     - summary: 전체적인 구강 건강 지수와 핵심 총평.

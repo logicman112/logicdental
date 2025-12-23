@@ -1,0 +1,7 @@
+{
+  "name": "로직이의 이빨살려",
+  "description": "로직이와 함께하는 AI 구강 건강 자가 검진 및 양치 기록 도우미입니다.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}

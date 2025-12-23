@@ -31,3 +31,10 @@ export interface AnalysisResponse {
   scalingUrgency: 'low' | 'medium' | 'high';
   sections: AnalysisSection[];
 }
+
+export interface DiagnosisRecord {
+  id: string;
+  date: string;
+  images: CapturedImages;
+  analysis: AnalysisResponse;
+}

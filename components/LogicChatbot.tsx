@@ -4,7 +4,7 @@ import { GoogleGenAI } from "@google/genai";
 
 const LogicChatbot: React.FC = () => {
   const [messages, setMessages] = useState<{role: 'user' | 'bot', text: string}[]>([
-    { role: 'bot', text: '안녕! 나는 너의 든든한 이빨 지킴이 로직이야!\n\n평소 치아 고민이나 궁금한 게 있다면\n편하게 말해줘!\n\n내가 친절하고 쉽게 설명해줄게! 🦷✨' }
+    { role: 'bot', text: '안녕! 나는 너의 든든한 이빨 지킴이 로직이야!\n\n평소 치아 고민이나 궁금한 게 있다면\n편하게 말해줘! 🦷✨' }
   ]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -17,34 +17,28 @@ const LogicChatbot: React.FC = () => {
   }, [messages]);
 
   const handleSend = async () => {
-    if (!input.trim() || isTyping) return;
+    const trimmedInput = input.trim();
+    if (!trimmedInput || isTyping) return;
 
-    const userMsg = input;
+    const userMsg = trimmedInput;
     setInput('');
     setMessages(prev => [...prev, { role: 'user', text: userMsg }]);
     setIsTyping(true);
 
     try {
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-      const response = await ai.models.generateContent({
+      const chat = ai.chats.create({
         model: 'gemini-3-flash-preview',
-        contents: [{ role: 'user', parts: [{ text: userMsg }] }],
         config: {
-          systemInstruction: `당신은 '로직이'라는 이름의 치과 전문가 챗봇입니다.
-          
-          [필수 준수 사항]
-          1. 절대 답변 중에 'AI', '참조용', '의학적 고지' 등의 딱딱한 문구를 넣지 마세요.
-          2. 가독성을 위해 1~2문장마다 반드시 줄바꿈을 하세요.
-          3. 전문 용어보다는 "이빨 사이 찌꺼기", "잇몸이 부었을 때" 처럼 아주 쉬운 표현을 쓰세요.
-          4. 말투는 친구처럼 아주 친근하게 (~했어, ~야) 하세요.
-          5. 이모지를 한 문장에 하나씩은 섞어서 생동감 있게 하세요.`,
+          systemInstruction: "당신은 치과 전문가 '로직이'입니다. 아주 친근한 말투(~했어, ~야)를 쓰고 줄바꿈을 자주 하세요.",
         }
       });
 
-      setMessages(prev => [...prev, { role: 'bot', text: response.text || '미안, 잠시 딴생각을 했나 봐!\n다시 한번 말해줄래? 😅' }]);
-    } catch (err) {
+      const response = await chat.sendMessage({ message: userMsg });
+      setMessages(prev => [...prev, { role: 'bot', text: response.text || '응? 다시 말해줘! 😅' }]);
+    } catch (err: any) {
       console.error("Chat Error:", err);
-      setMessages(prev => [...prev, { role: 'bot', text: '오류가 났어!\n양치하고 다시 시도해보자! 🪥' }]);
+      setMessages(prev => [...prev, { role: 'bot', text: '잠시 통신 장애가 있네! 다시 시도해줘! 🪥' }]);
     } finally {
       setIsTyping(false);
     }
@@ -69,7 +63,7 @@ const LogicChatbot: React.FC = () => {
         ))}
         {isTyping && (
           <div className="flex flex-col items-start">
-            <span className="text-[11px] font-[1000] text-white mb-2 uppercase tracking-widest px-4 opacity-70">Logic is thinking...</span>
+            <span className="text-[11px] font-[1000] text-white mb-2 uppercase tracking-widest px-4 opacity-70">로직이가 생각 중...</span>
             <div className="bg-white/10 p-6 rounded-[2rem] shadow-xl rounded-tl-none flex space-x-2 border border-white/20">
               <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce"></div>
               <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce delay-150"></div>

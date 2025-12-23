@@ -3,7 +3,7 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { AnalysisResponse } from "../types";
 
 export const analyzeDentalImages = async (upperBase64: string, lowerBase64: string): Promise<AnalysisResponse> => {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
   // 'gemini-flash-latest'는 Gemini 1.5 Flash 모델의 최신 배포 버전입니다.
   const model = 'gemini-flash-latest';
   
